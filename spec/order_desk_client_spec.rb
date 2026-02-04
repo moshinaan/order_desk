@@ -11,29 +11,6 @@ RSpec.describe OrderDesk::Client do
     described_class.new(store_id: store_id, api_key: api_key, base_url: base_url)
   end
 
-  describe '#order_properties' do
-    it 'keeps only order-property fields from the docs list' do
-      stub_request(:get, 'https://app.orderdesk.me/api/v2/orders/1001')
-        .to_return(
-          status: 200,
-          body: {
-            order: {
-              'id' => '1001',
-              'email' => 'buyer@example.com',
-              'total' => '49.99',
-              'custom_field' => 'raw'
-            }
-          }.to_json
-        )
-
-      expect(client.order_properties(1001)).to eq(
-        'id' => '1001',
-        'email' => 'buyer@example.com',
-        'total' => '49.99'
-      )
-    end
-  end
-
   describe 'error handling' do
     it 'raises AuthenticationError on 401' do
       stub_request(:get, 'https://app.orderdesk.me/api/v2/test')

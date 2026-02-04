@@ -40,14 +40,6 @@ module OrderDesk
       response['order'] || response
     end
 
-    # Convenience helper that returns only known order property keys.
-    def order_properties(order_id)
-      order = get_order(order_id)
-      order.each_with_object({}) do |(key, value), properties|
-        properties[key] = value if ORDER_PROPERTIES.include?(key)
-      end
-    end
-
     def get(path)
       request(:get, path)
     end

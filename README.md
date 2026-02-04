@@ -28,7 +28,7 @@ client = OrderDesk::Client.new(
 
 client.test_connection
 order = client.get_order(1001)
-properties = client.order_properties(1001)
+
 
 puts order
 puts properties
