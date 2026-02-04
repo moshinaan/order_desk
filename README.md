@@ -1,0 +1,40 @@
+# Order Desk Ruby Integration
+
+A minimal Ruby client for Order Desk API v2 with focus on order properties.
+
+## Setup
+
+```bash
+bundle install
+bundle exec rspec
+```
+
+## Environment variables
+
+```bash
+export ORDERDESK_STORE_ID="your-store-id"
+export ORDERDESK_API_KEY="your-api-key"
+```
+
+## Usage
+
+```ruby
+require_relative 'lib/order_desk'
+
+client = OrderDesk::Client.new(
+  store_id: ENV.fetch('ORDERDESK_STORE_ID'),
+  api_key: ENV.fetch('ORDERDESK_API_KEY')
+)
+
+client.test_connection
+order = client.get_order(1001)
+properties = client.order_properties(1001)
+
+puts order
+puts properties
+```
+
+## Notes
+
+- Base URL defaults to `https://app.orderdesk.me/api/v2`.
+- Auth headers are `ORDERDESK-STORE-ID` and `ORDERDESK-API-KEY`.
