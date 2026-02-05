@@ -19,7 +19,7 @@ export ORDERDESK_API_KEY="your-api-key"
 ## Usage
 
 ```ruby
-require_relative 'lib/order_desk'
+require 'order_desk'
 
 client = OrderDesk::Client.new(
   store_id: ENV.fetch('ORDERDESK_STORE_ID'),
