@@ -30,11 +30,13 @@ client.test_connection
 order = client.get_order(1001)
 orders = client.get_orders(params: { since: '2024-01-01', page: 1 })
 updated_order = client.update_order(1001, order: { order_id: 1001, order_items: [] })
+delete_response = client.delete_order(1001)
 
 
 puts order
 puts orders
 puts updated_order
+puts delete_response
 puts properties
 ```
 
