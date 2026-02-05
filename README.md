@@ -28,9 +28,11 @@ client = OrderDesk::Client.new(
 
 client.test_connection
 order = client.get_order(1001)
+orders = client.get_orders(params: { since: '2024-01-01', page: 1 })
 
 
 puts order
+puts orders
 puts properties
 ```
 
