@@ -44,6 +44,12 @@ module OrderDesk
       response['order'] || response
     end
 
+    # GET /orders
+    def get_orders(params: nil)
+      response = Requests::GetOrders.new(self).call(params: params)
+      response['orders'] || response
+    end
+
     def get(path)
       request(:get, path)
     end
