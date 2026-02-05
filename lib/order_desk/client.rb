@@ -12,20 +12,6 @@ module OrderDesk
       'Accept' => 'application/json'
     }.freeze
 
-    ORDER_PROPERTIES = %w[
-      id source_name source_id source_order_id source_order_number
-      first_name last_name company_name email phone shipping_method
-      shipping_first_name shipping_last_name shipping_company shipping_country
-      shipping_state shipping_city shipping_postal shipping_address1 shipping_address2
-      shipping_phone product_total shipping_total tax_total total currency_code
-      customer_id customer_username customer_email customer_url customer_first_name
-      customer_last_name customer_phone customer_company_name customer_notes
-      customer_created customer_modified customer_balance customer_type
-      customer_status customer_group source_updated date_added date_modified
-      shipping_residential shipping_courier shipping_tracking_number
-      shipping_tracking_url customer_organization vat_number tax_id
-    ].freeze
-
     def initialize(store_id:, api_key:, base_url: DEFAULT_BASE_URL, timeout: DEFAULT_TIMEOUT)
       @store_id = store_id
       @api_key = api_key
