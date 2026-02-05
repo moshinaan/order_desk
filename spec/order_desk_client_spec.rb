@@ -28,4 +28,17 @@ RSpec.describe OrderDesk::Client do
         .to raise_error(OrderDesk::RateLimitError) { |error| expect(error.retry_after).to eq(10) }
     end
   end
+
+  describe '#update_order' do
+    let(:request) { instance_double(OrderDesk::Requests::UpdateOrder) }
+    let(:order_id) { 1001 }
+    let(:order) { { 'id' => order_id, 'order_items' => [] } }
+
+    it 'returns the updated order payload' do
+      allow(OrderDesk::Requests::UpdateOrder).to receive(:new).with(client).and_return(request)
+      allow(request).to receive(:call).with(order_id: order_id, order: order).and_return('order' => order)
+
+      expect(client.update_order(order_id, order: order)).to eq(order)
+    end
+  end
 end

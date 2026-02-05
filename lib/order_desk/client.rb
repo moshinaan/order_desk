@@ -36,27 +36,39 @@ module OrderDesk
       response['orders'] || response
     end
 
+    # PUT /orders/:id
+    def update_order(order_id, order:)
+      response = Requests::UpdateOrder.new(self).call(order_id: order_id, order: order)
+      response['order'] || response
+    end
+
     def get(path)
       request(:get, path)
     end
 
+    def put(path, body:)
+      request(:put, path, body: body)
+    end
+
     private
 
-    def request(method, path)
+    def request(method, path, body: nil)
       uri = build_uri(path)
-      response = build_http(uri).request(build_request(method, uri))
+      response = build_http(uri).request(build_request(method, uri, body: body))
       handle_response(response)
     end
 
-    def build_request(method, uri)
+    def build_request(method, uri, body: nil)
       request_class = case method
                       when :get then Net::HTTP::Get
+                      when :put then Net::HTTP::Put
                       else
                         raise ArgumentError, "Unsupported HTTP method: #{method}"
                       end
 
       request = request_class.new(uri)
       build_headers.each { |header, value| request[header] = value }
+      attach_body(request, body) if body
       request
     end
 
@@ -65,6 +77,11 @@ module OrderDesk
         'ORDERDESK-STORE-ID' => @store_id,
         'ORDERDESK-API-KEY' => @api_key
       )
+    end
+
+    def attach_body(request, body)
+      request['Content-Type'] ||= 'application/json'
+      request.body = JSON.generate(body)
     end
 
     def build_uri(path)

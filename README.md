@@ -29,10 +29,12 @@ client = OrderDesk::Client.new(
 client.test_connection
 order = client.get_order(1001)
 orders = client.get_orders(params: { since: '2024-01-01', page: 1 })
+updated_order = client.update_order(1001, order: { order_id: 1001, order_items: [] })
 
 
 puts order
 puts orders
+puts updated_order
 puts properties
 ```
 
@@ -40,3 +42,4 @@ puts properties
 
 - Base URL defaults to `https://app.orderdesk.me/api/v2`.
 - Auth headers are `ORDERDESK-STORE-ID` and `ORDERDESK-API-KEY`.
+- Updating an order requires sending the complete order payload (fields omitted are cleared).
