@@ -6,7 +6,7 @@ A minimal Ruby client for Order Desk API v2 with focus on order properties.
 
 ```bash
 bundle install
-bundle exec rspec
+bundle exec rake test
 ```
 
 ## Environment variables
