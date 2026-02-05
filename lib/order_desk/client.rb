@@ -7,6 +7,10 @@ require 'uri'
 module OrderDesk
   class Client
     DEFAULT_BASE_URL = 'https://app.orderdesk.me/api/v2'
+    DEFAULT_TIMEOUT = 30
+    DEFAULT_HEADERS = {
+      'Accept' => 'application/json'
+    }.freeze
 
     ORDER_PROPERTIES = %w[
       id source_name source_id source_order_id source_order_number
@@ -22,10 +26,10 @@ module OrderDesk
       shipping_tracking_url customer_organization vat_number tax_id
     ].freeze
 
-    def initialize(store_id:, api_key:, base_url: DEFAULT_BASE_URL, timeout: 30)
+    def initialize(store_id:, api_key:, base_url: DEFAULT_BASE_URL, timeout: DEFAULT_TIMEOUT)
       @store_id = store_id
       @api_key = api_key
-      @base_url = base_url.end_with?('/') ? base_url : "#{base_url}/"
+      @base_url = normalized_base_url(base_url)
       @timeout = timeout
     end
 
@@ -47,21 +51,9 @@ module OrderDesk
     private
 
     def request(method, path)
-      uri = URI.join(@base_url, path.to_s.sub(%r{^/}, ''))
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == 'https'
-      http.open_timeout = @timeout
-      http.read_timeout = @timeout
-
-      request = build_request(method, uri)
-      response = http.request(request)
-
-      body = response.body.to_s
-      parsed_body = parse_json(body)
-
-      return parsed_body if response.code.to_i.between?(200, 299)
-
-      handle_error(response.code.to_i, parsed_body || body, response)
+      uri = build_uri(path)
+      response = build_http(uri).request(build_request(method, uri))
+      handle_response(response)
     end
 
     def build_request(method, uri)
@@ -72,10 +64,36 @@ module OrderDesk
                       end
 
       request = request_class.new(uri)
-      request['ORDERDESK-STORE-ID'] = @store_id
-      request['ORDERDESK-API-KEY'] = @api_key
-      request['Accept'] = 'application/json'
+      build_headers.each { |header, value| request[header] = value }
       request
+    end
+
+    def build_headers
+      DEFAULT_HEADERS.merge(
+        'ORDERDESK-STORE-ID' => @store_id,
+        'ORDERDESK-API-KEY' => @api_key
+      )
+    end
+
+    def build_uri(path)
+      URI.join(@base_url, path.to_s.sub(%r{^/}, ''))
+    end
+
+    def build_http(uri)
+      Net::HTTP.new(uri.host, uri.port).tap do |http|
+        http.use_ssl = uri.scheme == 'https'
+        http.open_timeout = @timeout
+        http.read_timeout = @timeout
+      end
+    end
+
+    def handle_response(response)
+      body = response.body.to_s
+      parsed_body = parse_json(body)
+
+      return parsed_body if response.code.to_i.between?(200, 299)
+
+      handle_error(response.code.to_i, parsed_body || body, response)
     end
 
     def parse_json(body)
@@ -96,6 +114,10 @@ module OrderDesk
       else
         raise ApiError.new('Order Desk API request failed', status: status, body: body)
       end
+    end
+
+    def normalized_base_url(url)
+      url.end_with?('/') ? url : "#{url}/"
     end
   end
 end
