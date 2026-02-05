@@ -42,12 +42,21 @@ module OrderDesk
       response['order'] || response
     end
 
+    # DELETE /orders/:id
+    def delete_order(order_id)
+      Requests::DeleteOrder.new(self).call(order_id: order_id)
+    end
+
     def get(path)
       request(:get, path)
     end
 
     def put(path, body:)
       request(:put, path, body: body)
+    end
+
+    def delete(path)
+      request(:delete, path)
     end
 
     private
@@ -62,6 +71,7 @@ module OrderDesk
       request_class = case method
                       when :get then Net::HTTP::Get
                       when :put then Net::HTTP::Put
+                      when :delete then Net::HTTP::Delete
                       else
                         raise ArgumentError, "Unsupported HTTP method: #{method}"
                       end
